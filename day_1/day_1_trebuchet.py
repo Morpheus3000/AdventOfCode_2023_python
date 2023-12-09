@@ -16,4 +16,4 @@ def main(file_path):
 
 
 if __name__ == '__main__':
-    main(file_path='data/day1_input.str')
+    main(file_path='../data/day1_input.str')
