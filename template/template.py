@@ -14,4 +14,3 @@ def main(file_path):
 
 if __name__ == '__main__':
     main(file_path='../data/day2_test.str')
-
