@@ -24,14 +24,15 @@ def find_attached_num(tgt_str, probe_idx):
     dig = '0'
     # Scan right
     start_idx = probe_idx
-    while dig.isnumeric() or start_idx < (l_len - 1):
+    while dig.isnumeric():
         start_idx += 1
         dig = tgt_str[start_idx]
         digits.append(dig)
+
     # Scan left
     dig = '0'
     start_idx = probe_idx
-    while dig.isnumeric() or start_idx > 0:
+    while dig.isnumeric():
         start_idx -= 1
         dig = tgt_str[start_idx]
         digits.insert(0, dig)
@@ -39,15 +40,14 @@ def find_attached_num(tgt_str, probe_idx):
 
     return digits
 
-
-
 def main(file_path):
-    lines = [x.strip() for x in open(file_path, 'r').readlines()]
+    # Patching because scanning expects '.' to be the last character. Otherwise
+    # need more complicated scan logic.
+    lines = ['.' + x.strip() + '.' for x in open(file_path, 'r').readlines()]
     print('[I] Found %d lines!' % len(lines))
     running_total = 0
     unique_sym = {}
     for i, l in enumerate(lines):
-        # print('Processing line %d...' % (i + 1), end='')
         sym_loc = {}
         filter_splits = [re.sub(r'[0-9]+', '', x) for x in l.split('.') if len(x) > 0 and not
                          x.isnumeric()]
@@ -57,13 +57,10 @@ def main(file_path):
                     'idx': find_all_occurences_indices(l, sym)
                 }
             unique_sym[i] = sym_loc
-    # print(unique_sym)
+
     # Assuming the first and last line never has any symbols in them.
-    running_total = 0
     for l_idx, sym_dict in unique_sym.items():
-        # 8: {'$': {'idx': [3]}, '*': {'idx': [5]}}
         for syms, sym_idx in sym_dict.items():
-            # '$': [3], '*': [5]
             for sym_id in sym_idx['idx']:
 
                 adj_nums = []
@@ -79,7 +76,6 @@ def main(file_path):
                 mid_num = find_attached_num(tgt_l, sym_id)
                 if mid_num == 0:
                     left_num = find_attached_num(tgt_l, sym_id - 1)
-                    print(len(tgt_l), sym_id + 1, l_idx - 1)
                     right_num = find_attached_num(tgt_l, sym_id + 1)
                     adj_nums.append(left_num)
                     adj_nums.append(right_num)
@@ -101,32 +97,9 @@ def main(file_path):
                 unique_sym[l_idx][syms]['adj_nums'] = adj_nums
                 running_total += sum(adj_nums)
 
-                # tgt_idx = [
-                #     (l_idx - 1, sym_id - 1),
-                #     (l_idx - 1, sym_id),
-                #     (l_idx - 1, sym_id + 1),
-                #     (l_idx, sym_id - 1),
-                #     (l_idx, sym_id + 1),
-                #     (l_idx + 1, sym_id - 1),
-                #     (l_idx + 1, sym_id),
-                #     (l_idx + 1, sym_id + 1),
-                # ]
-    # print(tgt_idx)
-    # l = lines[0]
-    # print(l)
-    # num = find_attached_num(l, 3)
-    # print(3, num)
-    # num = find_attached_num(l, 2)
-    # print(2, num)
-    # num = find_attached_num(l, 6)
-    # print(6, num)
-        # print('done!')
-        # print('\t[*] %s -> %d' % (l, num))
-        # running_total += num
-
     print('[I] Final total is: ', running_total)
 
 
 if __name__ == '__main__':
-    main(file_path='../data/day3_test.str')
-    # main(file_path='../data/day3_input.str')
+    # main(file_path='../data/day3_test.str')
+    main(file_path='../data/day3_input.str')
