@@ -62,6 +62,13 @@ sym_direction_dict = {
 }
 
 
+def print_map(grid):
+    print(len(grid))
+    all_rows = [''.join(x) for x in grid]
+    str_map = '\n'.join(all_rows)
+    print(str_map)
+
+
 def check_direction(cur_coord, prev_coord):
     # Movement is only in 4 directions. No diagonal movement.
     # u -> up
@@ -159,7 +166,8 @@ def main(file_path):
     # for i, l in enumerate(lines):
     #     grid.append([x.strip() for x in l])
 
-    pretty_print(grid)
+    # pretty_print(grid)
+    print_map(grid)
     start_idx = [(i, x.index('S')) for i, x in enumerate(grid) if 'S' in x][0]
     print(start_idx)
     grid_size = [len(grid), len(grid[0])]
