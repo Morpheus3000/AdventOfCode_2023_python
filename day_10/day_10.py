@@ -17,13 +17,13 @@ def pretty_print(l):
 #     'F': (-1, 1),
 # }
 
-map_dict = {
-    '|': lambda x, d: [x[0] + 1, x[1]] if d else [x[0] - 1, x[1]],
-    '-': lambda x, d: [x[0], x[1] + 1] if d else [x[0], x[1] - 1],
-    'L': lambda x, d: [x[0], x[1] + 1] if d else [x[0], x[1] - 1],
-    'J': lambda x, d: [x[0], x[1] - 1] if d else [x[0], x[1] + 1],
-    '7': lambda x, d: [x[0], x[1] - 1] if d else [x[0], x[1] + 1],
-    'F': lambda x, d: [x[0], x[1] + 1] if d else [x[0], x[1] - 1],
+map_movement_dict = {
+    '|': lambda x, d: ([x[0] + 1, x[1]], 'd') if d else ([x[0] - 1, x[1]], 'u'),
+    '-': lambda x, d: ([x[0], x[1] + 1], 'r') if d else ([x[0], x[1] - 1], 'l'),
+    'L': lambda x, d: ([x[0], x[1] + 1], 'r') if d else ([x[0] - 1, x[1]], 'u'),
+    'J': lambda x, d: ([x[0], x[1] - 1], 'l') if d else ([x[0] - 1, x[1]], 'u'),
+    '7': lambda x, d: ([x[0], x[1] - 1], 'l') if d else ([x[0] + 1, x[1]], 'd'),
+    'F': lambda x, d: ([x[0], x[1] + 1], 'r') if d else ([x[0] + 1, x[1]], 'd'),
 }
 
 # Possible connections based on incoming movements
@@ -157,6 +157,27 @@ def test():
     print(mv)
 
 
+def traversal_logic(grid, cur_coord, cur_mv):
+    print('in logic')
+    cur_y, cur_x = cur_coord
+    cur_op = grid[cur_y][cur_x]
+    direc = sym_direction_dict[cur_op][cur_mv]
+    # print(cur_op, cur_mv, direc)
+    next_coord, nex_mv = map_movement_dict[cur_op](cur_coord,
+                                           direc)
+    nex_y, nex_x = next_coord
+    nex_op = grid[nex_y][nex_x]
+    # print(cur_coord, next_coord, nex_op)
+    if nex_op in valid_con_dict[nex_mv]:
+        # nex_mv = check_direction(next_coord, cur_coord)
+        return {
+            'coord': next_coord,
+            'mov': nex_mv
+        }
+    else:
+        return None
+
+
 def main(file_path):
     lines = [x.strip() for x in open(file_path, 'r').readlines()]
     print('[I] Found %d lines!' % len(lines))
@@ -180,22 +201,55 @@ def main(file_path):
     prev_coord = start_connections[0]['coord']
 
     step_cnt = 0
-    while True:
-        y, x = prev_coord
-        op = grid[y][x]
-        if op != '.' and op != 'S':
-            next_coord = map_dict[op](prev_coord, True)
-            print(prev_coord, next_coord)
-            mv = check_direction(next_coord, prev_coord)
-            prev_coord = next_coord
+    cur_coord = start_idx
+    nex_coord = start_connections[0]['coord']
+    cur_mv = check_direction(nex_coord, cur_coord)
 
-            y, x, = prev_coord
-            op = grid[y][x]
-            print(op)
-            next_coord = map_dict[op](prev_coord, sym_direction_dict[op][mv])
-            print(mv)
-            print(next_coord)
-        break
+    cur_y, cur_x = cur_coord
+    nex_y, nex_x = nex_coord
+    print('Start info: ', end='')
+    print(cur_coord, nex_coord, cur_mv)
+    print('Syms: %s, %s, (%s)' % (
+        grid[cur_y][cur_x], grid[nex_y][nex_x], cur_mv
+    ))
+
+    cur_coord = nex_coord
+
+    for i in range(8):
+        print('-' * 20)
+        next_dict = traversal_logic(grid, cur_coord, cur_mv)
+        if next_dict is not None:
+            nex_coord = next_dict['coord']
+            nex_mv = next_dict['mov']
+            cur_y, cur_x = cur_coord
+            nex_y, nex_x = nex_coord
+            print('Start info: ', end='')
+            print(cur_coord, nex_coord, cur_mv)
+            print('Syms: %s, %s, (%s)' % (
+                grid[cur_y][cur_x], grid[nex_y][nex_x], cur_mv
+            ))
+
+            cur_coord = nex_coord
+            cur_mv = nex_mv
+
+        else:
+            print('Deadend!')
+    # while True:
+    #     y, x = prev_coord
+    #     op = grid[y][x]
+    #     if op != '.' and op != 'S':
+    #         next_coord = map_dict[op](prev_coord, True)
+    #         print(prev_coord, next_coord)
+    #         mv = check_direction(next_coord, prev_coord)
+    #         prev_coord = next_coord
+
+    #         y, x, = prev_coord
+    #         op = grid[y][x]
+    #         print(op)
+    #         next_coord = map_dict[op](prev_coord, sym_direction_dict[op][mv])
+    #         print(mv)
+    #         print(next_coord)
+    #     break
 
         
 
