@@ -129,6 +129,40 @@ def grid_print(grid, sym, coord, prev_line_num):
     [print(' '.join(grid[x, :])) for x in range(r)]
 
 
+def ray_cast(grid):
+    vis_grid = grid.copy()
+    r, c = vis_grid.shape
+    grid_print(vis_grid, '', [0, 0], 0)
+
+    rays = [{
+        'start': [0, 0],
+        'dir': 'r'
+    }]
+
+    cur_ray_ind = 0
+
+    inp_dir = rays[cur_ray_ind]['dir']
+    sym_coord = rays[cur_ray_ind]['start']
+    splitted = False
+
+    cnt = 0
+    while len(rays) > 0:
+        # grid_print(vis_grid, '*', sym_coord, r)
+        time.sleep(0.5)
+        tgt_sym = grid[sym_coord[0], sym_coord[1]]
+        print(cnt, sym_coord, tgt_sym, splitted, inp_dir)
+        if not splitted:
+            out_dict = cell_checker(inp_dir, tgt_sym, sym_coord)
+            inp_dir = out_dict['dir']
+            sym_coord = out_dict['coord']
+            tgt_sym = grid[sym_coord[0], sym_coord[1]]
+            splitted = out_dict['split']
+        if cnt > 10:
+            break
+        else:
+            cnt += 1
+
+
 def test(file_path):
     data = load_data(file_path)
     running_total = 0
@@ -138,20 +172,22 @@ def test(file_path):
     sym_coord = [2, 2]
     tgt_sym = '-'
 
-    for inp_dir in ['r', 'l', 'u', 'd']:
-        out_dict = cell_checker(inp_dir, tgt_sym, sym_coord)
-        print(sym_coord, end='')
-        print(' [%s : %s]' % (tgt_sym, inp_dir), end='')
-        print(' -> ', end='')
-        print(out_dict['coord'], end='')
-        print(out_dict['dir'], end='')
-        print(', Split: ', out_dict['split'])
+    # for inp_dir in ['r', 'l', 'u', 'd']:
+    #     out_dict = cell_checker(inp_dir, tgt_sym, sym_coord)
+    #     print(sym_coord, end='')
+    #     print(' [%s : %s]' % (tgt_sym, inp_dir), end='')
+    #     print(' -> ', end='')
+    #     print(out_dict['coord'], end='')
+    #     print(out_dict['dir'], end='')
+    #     print(', Split: ', out_dict['split'])
 
-    grid_print(data, '', [0, 0], 0)
-    for j in range(r):
-        for i in range(c):
-            time.sleep(0.5)
-            grid_print(data, '*', [j, i], r)
+    # grid_print(data, '', [0, 0], 0)
+    # for j in range(r):
+    #     for i in range(c):
+    #         time.sleep(0.5)
+    #         grid_print(data, '*', [j, i], r)
+    data[0, 1] = '-'
+    ray_cast(data)
 
 
 def main(file_path):
